@@ -5,7 +5,7 @@ draft: true
 # blog-cn
 
 ## 文档规范
-test ...
+
 
 头部的 meta 信息可包含以下内容：
 
