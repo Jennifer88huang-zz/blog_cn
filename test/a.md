@@ -6,7 +6,7 @@ draft: true
 
 ## 文档规范
 
-test2for another time
+test3
 头部的 meta 信息可包含以下内容：
 
 - `title` 文章标题
