@@ -160,16 +160,16 @@ Pulsar Function 有两大优点：
 4. 当 Function Metadata Manager 更新其内部状态时，会去触发 Scheduler Manager。因为这个时候系统有新的更新进来，必须对这个新的更新进行计算。这时候，处于 leader 状态的 worker 执行调度策略，看这一次的计算分配给谁执行比较合适，然后将新的分配写入到 Assignment Topic。 Membership Manager 用于维护集群中的 leader 以及所有处于 active 状态成员的列表。
 5. Function Runtime Manager 会去监听 Assignment Topic 看是否有新的更新。当有更新进来时，Function Runtime Manager 将更新其内部状态，其中包含所有 worker 的全局视图。如果有更新，Function Runtime Worker 会根据这个更新，判断是否需要 start 或者 stop function 的实例。 
 
-### 3.5 Pulsar Go Function实现
+## 4. Pulsar Go Function实现
 
 Pulsar Function 的 server 端和 client 端使用 protobuf 进行了解耦，原则上 protobuf 所能支持的语言，Pulsar Function 都可以支持。这大大简化了我们开发 Go Function 的工作，我们无需关心 runtime 和 worker 发生了什么事情。我们把要实现的 Go 语言的 instance 当作 client 端，两者中间通过 protobuf 协议进行交互。我们只需要根据预先定义好的 proto 文件，生成 Go 语言的 pb 文件，在此基础上封装一个 Go Function client 端，暴露给外部用户使用即可。之前 Pulsar Function 已支持 Java 和 Python，但是随着 Go 社区的壮大，对于 Go Function client 的需求也越来越多，所以我们急需 Go Function Client。这样，一方面可以丰富 Pulsar Function 的 client 端；同时也可方便熟悉 Go 语言的人快速了解、使用 Pulsar Function。
 
 
-#### 3.5.1 SDK实现思路
+### 4.1 SDK实现思路
 
 当我们以 SDK 的形式提供给用户时，用户只需要传入一个函数的名字，我们根据接收到的 function name 利用 Go 的反射来验证用户实现的参数和返回值列表是否正确。之后，我们将验证的结果以 handler 形式返回。拿到具体需要处理的 handler 之后，我们启动 Pulsar Client，创建消费者从 input topics 中去消费相应的 record，go func 处理完成之后，通过 producer 将结果输出到 output topic。
 
-#### 3.5.2 与 Java, Python Instance 的区别
+### 4.2 与 Java, Python Instance 的区别
 
 Pulsar 首先向用户暴露一个 Function 的接口。
 
@@ -187,7 +187,7 @@ Go 是一门静态类型的语言，本身不支持动态反射，所以我们�
 
 因此，在最终版本的 Go Function 实现中，我们把 Pulsar 实现的 Go Function Instance 也当作一个单独的 SDK 提供给用户，用户通过调用 Pulsar Go Instance SDK 将自己编写的 Function 注册进来。
 
-### 3.6 SDK example
+### 4.3 SDK example
 
 ```
 import (
